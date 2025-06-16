@@ -24,7 +24,7 @@ import os
 
 # Config
 load_dotenv()
-console = LoggingConfig()
+console = LoggingConfig().console
 
 redis_init = RedisConnection(os.getenv("REDIS_URL"))
 vectorstore = redis_init.get_vectorstore()
