@@ -5,12 +5,15 @@ from langgraph.constants import Send
 from langgraph.graph import END, StateGraph, START
 from config.redis_config import RedisConnection
 from config.log_config import LoggingConfig
+from config.decorators import node
+from schemas.prompts import scanning_prompt
 from schemas.models import EvaluationState, Evaluation
+from handlers.input_handler import InputHandler
+
 from rich.panel import Panel
 from pathlib import Path
 from typing import List
 from dotenv import load_dotenv
-from handlers.input_handler import InputHandler
 
 import base64
 import shutil
@@ -26,11 +29,12 @@ redis_init = RedisConnection(os.getenv("REDIS_URL"))
 vectorstore = redis_init.get_vectorstore()
 
 # Nodes
+@node
 def human_feedback_node(state: EvaluationState):
     """No-op node that should be interrupted on user input"""
     return state
 
-
+@node
 def init_evaluation(state: EvaluationState):
     return [
         Send("conduct_evaluation", {
@@ -42,12 +46,12 @@ def init_evaluation(state: EvaluationState):
         for model in llm_list
     ]
 
-
+@node
 def conduct_evaluation(state: EvaluationState):
     evaluation = image_scan(state)
     return {"evaluations": state.get("evaluations", []) + [evaluation]}
 
-
+@node
 def evaluation_summary(state: EvaluationState):
     evaluations = state["evaluations"]
     image_id = os.path.splitext(os.path.basename(state["input_image"]))[0]
@@ -76,20 +80,7 @@ def encode_image(image_path: str) -> str:
 def image_scan(state: EvaluationState) -> Evaluation:
     b64 = encode_image(state["input_image"])
     structured_llm = state["model"].with_structured_output(Evaluation)
-    prompt = f"""
-        You are a historical‐document expert. Provide:
-        1) A perfect literal transcription in the original language, respecting the original orthography, punctuation, spacing and formatting.
-        2) An English translation.
-        3) A list of English keywords about the document. IMPORTANT: use capital letters initials only for proper names.
-
-        Consider that sometimes the document page may end with a truncated word, which is finishing on the next page.
-        In this case, don't complete the word.
-
-        Sometimes there is no text since the picture may represent just a cover, an illustration or a blank page. In that case, just
-        keep the related fields empty.
-
-        Take into account the user feedback about the document (if any): {state.get('human_feedback','')}
-        """
+    prompt = scanning_prompt
     result = structured_llm.invoke([
         SystemMessage(content=prompt),
         HumanMessage(content=[
