@@ -21,5 +21,5 @@ This is a Python project designed to analyze historical documents using a LangGr
 ├── graph.py             # LangGraph pipeline definition
 ├── langgraph.json       # LangGraph configuration file
 ├── query_agent.py       # LLM-powered query agent
-└── redis_store.py       # Redis storage logic
+└── redis_store.py       # Redis storage check
 ```
