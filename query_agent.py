@@ -22,7 +22,7 @@ import asyncio
 import os
 
 
-# ─── CONFIG ────────────────────────────────────────────────────────────────
+# Config
 load_dotenv()
 console = LoggingConfig()
 
@@ -31,7 +31,7 @@ vectorstore = redis_init.get_vectorstore()
 
 model = LitellmModel(model="gemini/gemini-2.5-flash-preview-05-20", api_key=os.getenv("GOOGLE_API_KEY"))
 
-# ─── FUNCTIONS ─────────────────────────────────────────────────────────────
+# Agents and functions
 async def guardrail_function(ctx: RunContextWrapper[Any], agent: Agent, input: str | list[TResponseInputItem]) -> GuardrailFunctionOutput:
     result = await Runner.run(guardrail_agent, input, context=ctx.context)
     final_output = result.final_output_as(InputCheck)
@@ -112,6 +112,5 @@ async def chat_loop():
         console.print(f"An error occurred: {e}")
 
 
-# ─── MAIN ──────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     asyncio.run(chat_loop())
