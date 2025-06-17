@@ -3,8 +3,8 @@ from rich.prompt import Prompt
 from rich.panel import Panel
 from config.redis_config import RedisConnection
 from config.log_config import LoggingConfig
+from config.llm_config import get_llm_config
 from schemas.models import QueryCheck, QueryGraph
-from agents.extensions.models.litellm_model import LitellmModel
 from agents import (
     Agent,
     InputGuardrail,
@@ -16,20 +16,19 @@ from agents import (
     TResponseInputItem,
 )
 from typing import Any
-from dotenv import load_dotenv
-
 import asyncio
 import os
 
 
 # Config
-load_dotenv()
 console = LoggingConfig().console
 
 redis_init = RedisConnection(os.getenv("REDIS_URL"))
 vectorstore = redis_init.get_vectorstore()
 
-model = LitellmModel(model="gemini/gemini-2.5-flash-preview-05-20", api_key=os.getenv("GOOGLE_API_KEY"))
+# Get query model from config
+llm_config = get_llm_config()
+model = llm_config.get_model('query')
 
 # Agents and functions
 async def guardrail_function(ctx: RunContextWrapper[Any], agent: Agent, input: str | list[TResponseInputItem]) -> GuardrailFunctionOutput:

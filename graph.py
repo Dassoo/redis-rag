@@ -1,4 +1,3 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import Send
@@ -6,28 +5,31 @@ from langgraph.graph import END, StateGraph, START
 from config.redis_config import RedisConnection
 from config.log_config import LoggingConfig
 from config.decorators import node
+from config.llm_config import get_llm_config
 from schemas.models import EvaluationState, Evaluation
 from handlers.input_handler import InputHandler
 from handlers.output_handler import OutputHandler
 
 from rich.panel import Panel
 from pathlib import Path
-from dotenv import load_dotenv
-
 import base64
 import shutil
 import time
 import os
 
-load_dotenv()
 start_time = time.time()
 console = LoggingConfig().console
+
+# Initialize LLM configuration
+llm_config = get_llm_config()
 
 # Redis store
 redis_init = RedisConnection(os.getenv("REDIS_URL"))
 vectorstore = redis_init.get_vectorstore()
 
 # Nodes
+# Get vision model from config
+model = llm_config.get_model('vision')
 @node
 def human_feedback_node(state: EvaluationState):
     """No-op node that should be interrupted on user input"""
@@ -70,7 +72,7 @@ def image_scan(state: EvaluationState) -> Evaluation:
     prompt = f"""
         You are a historical‐document expert. Provide:
         1) A perfect literal transcription in the original language, respecting the original orthography, punctuation, spacing and formatting.
-        2) An English translation (if the document is already written in modern English, leave the "translation" field empty instead).
+        2) An English translation (if the document is already written in modern English, leave ONLY the "translation" field empty instead).
         3) A list of English keywords about the document. IMPORTANT: use capital letters initials only for proper names.
 
         Consider that sometimes the document page may end with a truncated word, which is finishing on the next page.
@@ -95,7 +97,7 @@ def image_scan(state: EvaluationState) -> Evaluation:
 
 
 # Assemble and run graph
-llm_list = [ ChatGoogleGenerativeAI(model="gemini-2.5-pro-preview-06-05", temperature=0) ]
+llm_list = [ model ] # Models other than the default one may be added for further evaluations
 
 builder = StateGraph(EvaluationState)
 builder.add_node("human_feedback_node", human_feedback_node)
@@ -112,10 +114,11 @@ graph = builder.compile(checkpointer=MemorySaver(), interrupt_before=["human_fee
 
 # Input config
 INPUT_PATH = Path("samples/tensorflow.pdf")  # Can be a folder or a PDF
-image_files = InputHandler().extract(INPUT_PATH)
-
 TEMP_IMAGE_DIR = Path(INPUT_PATH.stem)
 TEMP_IMAGE_DIR.mkdir(exist_ok=True)
+
+image_files = InputHandler().extract(INPUT_PATH)
+
 
 feedback = input("Would you like to give some human-in-the-loop feedback for every scanned page? (y/n)")
 if feedback.lower() == "y":

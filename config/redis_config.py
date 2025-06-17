@@ -1,12 +1,11 @@
 from langchain_redis import RedisConfig, RedisVectorStore
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from config.log_config import LoggingConfig
+from config.llm_config import get_llm_config
 from rich.prompt import Prompt
 from rich.panel import Panel
 from collections import defaultdict
 from dotenv import load_dotenv
 import os
-
 
 class RedisConnection:
     """Class for initializing and managing Redis connection and vector store."""
@@ -17,7 +16,9 @@ class RedisConnection:
         self.console = LoggingConfig().console
         self.console.print(f"Connecting to {os.getenv('REDIS_URL') or url}", style="system")
 
-        self.embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
+        # Get embeddings model from config
+        llm_config = get_llm_config()
+        self.embeddings = llm_config.get_model('embeddings')
         
         self.config = RedisConfig(
             index_name="index",
