@@ -8,10 +8,10 @@ load_dotenv()
 redis_url = os.getenv("REDIS_URL")
 
 console = LoggingConfig().console
-console.print(f"[system]Connecting to {redis_url}[/system]")
+console.print(f"Connecting to {redis_url}", style="system")
 try:
     redis_init = RedisConnection(redis_url)
     redis_init.read_vectorstore()
 except Exception as e:
-    console.print(f"[error]❌ Error connecting to Redis: {e}[/error]")
+    console.print(f"❌ Error connecting to Redis: {e}", style="error")
     exit()

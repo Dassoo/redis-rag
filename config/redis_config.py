@@ -38,7 +38,7 @@ class RedisConnection:
     def read_vectorstore(self) -> None:
         """Fetch and display documents from the RedisVectorStore."""
         console = LoggingConfig().console
-        console.print("[system]Fetching all available documents from the RedisVectorStore...[/system]")
+        console.print("Fetching all available documents from the RedisVectorStore...", style="system")
         docs = self.vectorstore.similarity_search("dummy", k=1000)
         books = defaultdict(lambda: defaultdict(list))
         for doc in docs:
@@ -56,7 +56,7 @@ class RedisConnection:
             book_index = int(Prompt.ask("\nSelect a book number to view", console=console))
             selected_book = book_names[book_index]
         except (ValueError, IndexError):
-            console.print("[error]❌ Invalid book selection.[/error]")
+            console.print("❌ Invalid book selection.", style="error")
             exit()
 
         # Select document in book
@@ -70,7 +70,7 @@ class RedisConnection:
             index = int(Prompt.ask("\nSelect a page number to view", console=console))
             selected_id = image_ids[index]
         except (ValueError, IndexError):
-            console.print("[error]❌ Invalid page selection.[/error]")
+            console.print("❌ Invalid page selection.", style="error")
             exit()
 
         # Display document

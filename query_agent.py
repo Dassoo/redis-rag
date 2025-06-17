@@ -88,18 +88,18 @@ async def chat_loop():
     console.print("Chat session started. Type 'exit' to quit.\n", style="system")
     
     try:
-        user_input = Prompt.ask("[input]You[/input]", console=console)
+        user_input = Prompt.ask("You", console=console, style="input")
         if user_input.strip().lower() in {"exit", "quit"}:
-            console.print("\n[system]Goodbye![/system]")
+            console.print("\nGoodbye!", style="system")
             return
         new_messages = context_retrieval(user_input)
         response = await Runner.run(query_agent, new_messages)
         console.print(Panel.fit(response.final_output, title="📜 Assistant", title_align="left", border_style="assistant"))
 
         while True:
-            user_input = Prompt.ask("[input]You[/input]", console=console)
+            user_input = Prompt.ask("You", console=console)
             if user_input.strip().lower() in {"exit", "quit"}:
-                console.print("\n[system]Goodbye![/system]")
+                console.print("\nGoodbye!", style="system")
                 return
             new_messages = context_retrieval(user_input)
             new_input = response.to_input_list() + new_messages

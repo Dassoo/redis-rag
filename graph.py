@@ -21,7 +21,6 @@ import os
 
 load_dotenv()
 start_time = time.time()
-
 console = LoggingConfig().console
 
 # Redis store
@@ -128,7 +127,7 @@ else:
 for image_path in image_files:
     image_id = Path(image_path).stem
 
-    console.rule(f"[event]Processing {Path(image_path).name}[/event]")
+    console.rule(f"Processing {Path(image_path).name}", style="event")
 
     try:
         thread = {"configurable": {"thread_id": f"{INPUT_PATH.name}:{image_id}"}}
@@ -152,9 +151,9 @@ for image_path in image_files:
             console.print(Panel.fit(str(event), title="📦 Event", border_style="event"))
 
     except Exception as e:
-        console.print(f"[error]❌ Error processing {Path(image_path).name}: {e}[/error]")
+        console.print(f"❌ Error processing {Path(image_path).name}: {e}", style="error")
 
-console.print(f"[system]Execution time: --- {time.time() - start_time:.2f} seconds ---")
+console.print(f"Execution time: --- {time.time() - start_time:.2f} seconds ---", style="system")
 
 # if INPUT_PATH.suffix.lower() == ".pdf":
 #     shutil.rmtree(TEMP_IMAGE_DIR)
