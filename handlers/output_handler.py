@@ -40,5 +40,3 @@ class OutputHandler:
         with open(fn, "w") as f:
             json.dump([e.model_dump() for e in evals], f, indent=2)
 
-    def save_to_csv(self, evals: List[Document], image_path: str):
-        pass

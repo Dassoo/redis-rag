@@ -16,9 +16,11 @@ from dotenv import load_dotenv
 
 import base64
 import shutil
+import time
 import os
 
 load_dotenv()
+start_time = time.time()
 
 console = LoggingConfig().console
 
@@ -69,7 +71,7 @@ def image_scan(state: EvaluationState) -> Evaluation:
     prompt = f"""
         You are a historical‐document expert. Provide:
         1) A perfect literal transcription in the original language, respecting the original orthography, punctuation, spacing and formatting.
-        2) An English translation.
+        2) An English translation (if the document is already written in modern English, leave the "translation" field empty instead).
         3) A list of English keywords about the document. IMPORTANT: use capital letters initials only for proper names.
 
         Consider that sometimes the document page may end with a truncated word, which is finishing on the next page.
@@ -88,7 +90,8 @@ def image_scan(state: EvaluationState) -> Evaluation:
         ])
     ])
     state['human_feedback'] = None
-    result.model = type(state["model"]).__name__
+    # Use the actual model name from the model's configuration
+    result.model = state["model"].model
     return result
 
 
@@ -136,7 +139,7 @@ for image_path in image_files:
             "human_feedback": ""
         }
 
-        # Run graph
+        # Run graph verbose
         for event in graph.stream(initial_state, thread, stream_mode="values"):
             console.print(Panel.fit(str(event), title="📦 Event", border_style="event"))
 
@@ -151,6 +154,7 @@ for image_path in image_files:
     except Exception as e:
         console.print(f"[error]❌ Error processing {Path(image_path).name}: {e}[/error]")
 
+console.print(f"[system]Execution time: --- {time.time() - start_time:.2f} seconds ---")
 
 # if INPUT_PATH.suffix.lower() == ".pdf":
 #     shutil.rmtree(TEMP_IMAGE_DIR)

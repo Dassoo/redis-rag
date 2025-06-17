@@ -49,7 +49,6 @@ def build_prompt(query: str, context_docs: list[Document]) -> list:
         f"[{doc.metadata.get('book_id', 'unknown')} / {doc.metadata.get('image_id', 'unknown')}] {doc.page_content.strip()}"
         for doc in context_docs
     )
-
     system_prompt = f"""
         You are a helpful assistant that answers questions about historical documents, which are grouped by book.
 
@@ -70,7 +69,7 @@ def context_retrieval(user_input: str):
 
 
 guardrail_agent = Agent(
-    name="Input check",
+    name="Input Check",
     instructions="Check if the user input is related to a query search using the stored documents.",
     output_type=InputCheck,
     model=model,
