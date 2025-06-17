@@ -112,10 +112,10 @@ graph = builder.compile(checkpointer=MemorySaver(), interrupt_before=["human_fee
 
 # Input config
 INPUT_PATH = Path("samples/tensorflow.pdf")  # Can be a folder or a PDF
+image_files = InputHandler().extract(INPUT_PATH)
+
 TEMP_IMAGE_DIR = Path(INPUT_PATH.stem)
 TEMP_IMAGE_DIR.mkdir(exist_ok=True)
-
-image_files = InputHandler().extract(INPUT_PATH)
 
 feedback = input("Would you like to give some human-in-the-loop feedback for every scanned page? (y/n)")
 if feedback.lower() == "y":

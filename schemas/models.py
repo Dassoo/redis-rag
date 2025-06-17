@@ -18,6 +18,6 @@ class EvaluationState(TypedDict):
     human_feedback: str
 
 # Query guardrail
-class InputCheck(BaseModel):
+class QueryCheck(BaseModel):
     is_content_or_search_related: bool
     reasoning: str

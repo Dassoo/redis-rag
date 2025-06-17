@@ -3,7 +3,7 @@ from rich.prompt import Prompt
 from rich.panel import Panel
 from config.redis_config import RedisConnection
 from config.log_config import LoggingConfig
-from schemas.models import InputCheck
+from schemas.models import QueryCheck
 from agents.extensions.models.litellm_model import LitellmModel
 from agents import (
     Agent,
@@ -34,7 +34,7 @@ model = LitellmModel(model="gemini/gemini-2.5-flash-preview-05-20", api_key=os.g
 # Agents and functions
 async def guardrail_function(ctx: RunContextWrapper[Any], agent: Agent, input: str | list[TResponseInputItem]) -> GuardrailFunctionOutput:
     result = await Runner.run(guardrail_agent, input, context=ctx.context)
-    final_output = result.final_output_as(InputCheck)
+    final_output = result.final_output_as(QueryCheck)
     return GuardrailFunctionOutput(
         output_info=final_output,
         tripwire_triggered=not final_output.is_content_or_search_related,
@@ -71,7 +71,7 @@ def context_retrieval(user_input: str):
 guardrail_agent = Agent(
     name="Input Check",
     instructions="Check if the user input is related to a query search using the stored documents.",
-    output_type=InputCheck,
+    output_type=QueryCheck,
     model=model,
 )
 
