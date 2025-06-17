@@ -9,11 +9,14 @@ import os
 
 
 class RedisConnection:
-    """Class for initializing Redis connection and vector store."""
+    """Class for initializing and managing Redis connection and vector store."""
 
-    def __init__(self, url):
+    def __init__(self, url: str):
         """Initialize Redis connection and vector store."""
         load_dotenv()
+        self.console = LoggingConfig().console
+        self.console.print(f"Connecting to {os.getenv('REDIS_URL') or url}", style="system")
+
         self.embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
         
         self.config = RedisConfig(
@@ -37,8 +40,7 @@ class RedisConnection:
         
     def read_vectorstore(self) -> None:
         """Fetch and display documents from the RedisVectorStore."""
-        console = LoggingConfig().console
-        console.print("Fetching all available documents from the RedisVectorStore...", style="system")
+        self.console.print("Fetching all available documents from the RedisVectorStore...", style="system")
         docs = self.vectorstore.similarity_search("dummy", k=1000)
         books = defaultdict(lambda: defaultdict(list))
         for doc in docs:
@@ -48,36 +50,36 @@ class RedisConnection:
 
         book_names = sorted(books.keys())
 
-        console.print("\n📚 [info]Available books:[/info]")
+        self.console.print("\n📚 [info]Available books:[/info]")
         for i, book in enumerate(book_names):
-            console.print(f"[info]{i}[/info]: {book}")
+            self.console.print(f"[info]{i}[/info]: {book}")
 
         try:
-            book_index = int(Prompt.ask("\nSelect a book number to view", console=console))
+            book_index = int(Prompt.ask("\nSelect a book number to view", console=self.console))
             selected_book = book_names[book_index]
         except (ValueError, IndexError):
-            console.print("❌ Invalid book selection.", style="error")
+            self.console.print("❌ Invalid book selection.", style="error")
             exit()
 
         # Select document in book
         image_ids = sorted(books[selected_book].keys())
 
-        console.print(f"\n📦 [info]Documents in book '{selected_book}':[/info]")
+        self.console.print(f"\n📦 [info]Documents in book '{selected_book}':[/info]")
         for i, img_id in enumerate(image_ids):
-            console.print(f"[info]{i}[/info]: {img_id}")
+            self.console.print(f"[info]{i}[/info]: {img_id}")
 
         try:
-            index = int(Prompt.ask("\nSelect a page number to view", console=console))
+            index = int(Prompt.ask("\nSelect a page number to view", console=self.console))
             selected_id = image_ids[index]
         except (ValueError, IndexError):
-            console.print("❌ Invalid page selection.", style="error")
+            self.console.print("❌ Invalid page selection.", style="error")
             exit()
 
         # Display document
-        console.print(f"\n📄 [document]Content of '{selected_id}' ('{selected_book}'):[/document]")
+        self.console.print(f"\n📄 [document]Content of '{selected_id}' ('{selected_book}'):[/document]")
 
         for doc in books[selected_book][selected_id]:
-            console.print(Panel.fit(
+            self.console.print(Panel.fit(
                 doc.page_content.strip(),
                 title=f"[bold]{selected_id}[/bold]",
                 border_style="document"

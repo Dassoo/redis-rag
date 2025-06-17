@@ -8,7 +8,6 @@ load_dotenv()
 redis_url = os.getenv("REDIS_URL")
 
 console = LoggingConfig().console
-console.print(f"Connecting to {redis_url}", style="system")
 try:
     redis_init = RedisConnection(redis_url)
     redis_init.read_vectorstore()

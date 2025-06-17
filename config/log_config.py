@@ -18,7 +18,7 @@ class LoggingConfig:
             "document": "green",
         }))
 
-        logging.getLogger("LiteLLM").setLevel(logging.WARNING)
-        logging.getLogger("httpx").setLevel(logging.WARNING)
-        logging.getLogger("asyncio").setLevel(logging.WARNING)
-        logging.getLogger("redisvl").setLevel(logging.WARNING)
+        logging.getLogger("LiteLLM").setLevel(logging.ERROR)
+        logging.getLogger("httpx").setLevel(logging.ERROR)
+        logging.getLogger("asyncio").setLevel(logging.ERROR)
+        logging.getLogger("redisvl").setLevel(logging.ERROR)

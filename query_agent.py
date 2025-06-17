@@ -92,7 +92,7 @@ graph_agent = Agent(
 )
 
 async def chat_loop():
-    console.print("Chat session started. Type 'exit' to quit.\n", style="system")
+    console.print("\nChat session started. Type 'exit' to quit.", style="system")
 
     try:
         conversation_history = []
@@ -116,9 +116,9 @@ async def chat_loop():
             conversation_history = response.to_input_list()
 
     except (InputGuardrailTripwireTriggered, OutputGuardrailTripwireTriggered):
-        console.print("Request not supported", style="error")
+        console.print("❌ Request not supported", style="error")
     except Exception as e:
-        console.print(f"An error occurred: {e}", style="error")
+        console.print(f"❌ An error occurred: {e}", style="error")
 
 
 if __name__ == "__main__":
