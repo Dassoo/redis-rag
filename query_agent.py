@@ -3,7 +3,7 @@ from rich.prompt import Prompt
 from rich.panel import Panel
 from config.redis_config import RedisConnection
 from config.log_config import LoggingConfig
-from schemas.models import QueryCheck
+from schemas.models import QueryCheck, QueryGraph
 from agents.extensions.models.litellm_model import LitellmModel
 from agents import (
     Agent,
@@ -19,6 +19,7 @@ from typing import Any
 from dotenv import load_dotenv
 
 import asyncio
+import json
 import os
 
 
@@ -84,11 +85,18 @@ query_agent = Agent(
     model=model,
 )
 
+graph_agent = Agent(
+    name="Graph Agent",
+    instructions="Based on the query, build a relationship graph. Do not add any additional text or explanation. Only return the required graph.",
+    output_type=QueryGraph,
+    model=model,
+)
+
 async def chat_loop():
     console.print("Chat session started. Type 'exit' to quit.\n", style="system")
     
     try:
-        user_input = Prompt.ask("You", console=console, style="input")
+        user_input = Prompt.ask("[input]You[/input]", console=console)
         if user_input.strip().lower() in {"exit", "quit"}:
             console.print("\nGoodbye!", style="system")
             return
@@ -96,8 +104,11 @@ async def chat_loop():
         response = await Runner.run(query_agent, new_messages)
         console.print(Panel.fit(response.final_output, title="📜 Assistant", title_align="left", border_style="assistant"))
 
+        graph_response = await Runner.run(graph_agent, new_messages)
+        console.print(graph_response.final_output, style="assistant")
+
         while True:
-            user_input = Prompt.ask("You", console=console)
+            user_input = Prompt.ask("[input]You[/input]", console=console)
             if user_input.strip().lower() in {"exit", "quit"}:
                 console.print("\nGoodbye!", style="system")
                 return
@@ -105,6 +116,9 @@ async def chat_loop():
             new_input = response.to_input_list() + new_messages
             response = await Runner.run(query_agent, new_input)
             console.print(Panel.fit(response.final_output, title="📜 Assistant", title_align="left", border_style="assistant"))
+
+            graph_response = await Runner.run(graph_agent, new_input)
+            console.print(graph_response.final_output, style="assistant")
     except InputGuardrailTripwireTriggered or OutputGuardrailTripwireTriggered:
         console.print("Request not supported")
     except Exception as e:
