@@ -3,25 +3,26 @@ from typing import List, Annotated, Any
 from typing_extensions import TypedDict
 from operator import add
 
-# Single document page
+# Single document page evaluation
 class Evaluation(BaseModel):
-    model: str
-    transcription: str
-    translation: str
-    keywords: List[str]
+    model: str = Field(description="LLM version used to scan the document.")
+    transcription: str = Field(description="Literal transcription of the document.")
+    translation: str = Field(description="English translation of the document.")
+    keywords: List[str] = Field(description="List of keywords about the document.")
 
-# LangChain state
+# LangChain graph state
 class EvaluationState(TypedDict):
     evaluations: Annotated[List[Evaluation], add]
-    model: Any
-    input_image: str
-    human_feedback: str
+    model: Any = Field(description="LLM version used to scan the document.")
+    input_image: str = Field(description="Input image path.")
+    human_feedback: str = Field(description="(Optional) Feedback from the user about the document.")
 
 # Query guardrail
 class QueryCheck(BaseModel):
-    is_content_or_search_related: bool
-    reasoning: str
+    is_content_or_search_related: bool = Field(description="Check whether the query is related to the content or to a search in the documents.")
+    reasoning: str = Field(description="Explain why the query is related to the content or search in the documents.")
 
+# Connections to the subject of the user query
 class QueryGraphConnection(BaseModel):
     connection_name: str = Field(description="The name of the connection, which may be a name, an object, a place, etc.")
     source: str = Field(description="The source of the connection, which is the document name and page number.")

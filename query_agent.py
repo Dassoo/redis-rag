@@ -109,6 +109,7 @@ async def chat_loop():
             response = await Runner.run(query_agent, full_input)
             console.print(Panel.fit(response.final_output, title="📜 Assistant", title_align="left", border_style="assistant"))
 
+            # Makes graph only if user input ends with "-g"
             if user_input.endswith("-g"):
                 graph_response = await Runner.run(graph_agent, full_input)
                 console.print(graph_response.final_output, style="assistant")
