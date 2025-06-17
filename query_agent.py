@@ -19,7 +19,6 @@ from typing import Any
 from dotenv import load_dotenv
 
 import asyncio
-import json
 import os
 
 
@@ -94,35 +93,32 @@ graph_agent = Agent(
 
 async def chat_loop():
     console.print("Chat session started. Type 'exit' to quit.\n", style="system")
-    
-    try:
-        user_input = Prompt.ask("[input]You[/input]", console=console)
-        if user_input.strip().lower() in {"exit", "quit"}:
-            console.print("\nGoodbye!", style="system")
-            return
-        new_messages = context_retrieval(user_input)
-        response = await Runner.run(query_agent, new_messages)
-        console.print(Panel.fit(response.final_output, title="📜 Assistant", title_align="left", border_style="assistant"))
 
-        graph_response = await Runner.run(graph_agent, new_messages)
-        console.print(graph_response.final_output, style="assistant")
+    try:
+        conversation_history = []
 
         while True:
-            user_input = Prompt.ask("[input]You[/input]", console=console)
+            user_input = Prompt.ask("\n[input]You[/input]", console=console)
             if user_input.strip().lower() in {"exit", "quit"}:
                 console.print("\nGoodbye!", style="system")
-                return
+                break
+
             new_messages = context_retrieval(user_input)
-            new_input = response.to_input_list() + new_messages
-            response = await Runner.run(query_agent, new_input)
+            full_input = conversation_history + new_messages
+
+            response = await Runner.run(query_agent, full_input)
             console.print(Panel.fit(response.final_output, title="📜 Assistant", title_align="left", border_style="assistant"))
 
-            graph_response = await Runner.run(graph_agent, new_input)
-            console.print(graph_response.final_output, style="assistant")
-    except InputGuardrailTripwireTriggered or OutputGuardrailTripwireTriggered:
-        console.print("Request not supported")
+            if user_input.endswith("-g"):
+                graph_response = await Runner.run(graph_agent, full_input)
+                console.print(graph_response.final_output, style="assistant")
+
+            conversation_history = response.to_input_list()
+
+    except (InputGuardrailTripwireTriggered, OutputGuardrailTripwireTriggered):
+        console.print("Request not supported", style="error")
     except Exception as e:
-        console.print(f"An error occurred: {e}")
+        console.print(f"An error occurred: {e}", style="error")
 
 
 if __name__ == "__main__":
