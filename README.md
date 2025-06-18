@@ -7,7 +7,7 @@ This is a Python project designed to analyze historical documents using a LangGr
 ## Features
 
 - 📄 **Document Processing Pipeline**: Process images or documents using LangGraph to extract and store evaluations.
-- 🧠 **LLM-Powered Querying**: Natural language queries over Redis-stored evaluations using an intelligent query agent, which include custom graphs on the searched subject by ending the query with "-g".
+- 🧠 **LLM-Powered Querying**: Natural language queries over Redis-stored evaluations using an intelligent query agent, which include a relationship graph about the queried subject by ending the query with "-g".
 - 💾 **Redis Integration**: Efficient storage and retrieval of structured data (e.g., `book_id`, `image_id`).
 - ⚙️ **Modular Architecture**: Separate modules for graph definition, Redis store logic, and query handling.
 
