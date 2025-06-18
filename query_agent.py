@@ -3,7 +3,7 @@ from rich.prompt import Prompt
 from rich.panel import Panel
 from config.redis_config import RedisConnection
 from config.log_config import LoggingConfig
-from config.llm_config import get_llm_config
+from config.llm_config import LLMConfig
 from schemas.models import QueryCheck, QueryGraph
 from agents import (
     Agent,
@@ -27,7 +27,7 @@ redis_init = RedisConnection(os.getenv("REDIS_URL"))
 vectorstore = redis_init.get_vectorstore()
 
 # Get query model from config
-llm_config = get_llm_config()
+llm_config = LLMConfig()
 model = llm_config.get_model('query')
 
 # Agents and functions

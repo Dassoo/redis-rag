@@ -1,6 +1,6 @@
 from langchain_redis import RedisConfig, RedisVectorStore
 from config.log_config import LoggingConfig
-from config.llm_config import get_llm_config
+from config.llm_config import LLMConfig
 from rich.prompt import Prompt
 from rich.panel import Panel
 from collections import defaultdict
@@ -17,7 +17,7 @@ class RedisConnection:
         self.console.print(f"Connecting to {os.getenv('REDIS_URL') or url}", style="system")
 
         # Get embeddings model from config
-        llm_config = get_llm_config()
+        llm_config = LLMConfig()
         self.embeddings = llm_config.get_model('embeddings')
         
         self.config = RedisConfig(

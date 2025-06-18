@@ -41,8 +41,3 @@ class LLMConfig:
             raise ValueError(f"Unknown model type: {model_type}")
         return self._models[model_type]
 
-# Initialize global LLM configuration
-llm_config = LLMConfig()
-
-# Export the global instance
-get_llm_config = lambda: llm_config
