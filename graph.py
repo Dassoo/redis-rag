@@ -2,12 +2,10 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import Send
 from langgraph.graph import END, StateGraph, START
-from config.redis_config import RedisConnection
 from config.log_config import LoggingConfig
 from config.decorators import node
 from config.llm_config import LLMConfig
 from schemas.models import EvaluationState, Evaluation
-from handlers.input_handler import InputHandler
 from handlers.output_handler import OutputHandler
 
 from rich.panel import Panel
@@ -24,17 +22,12 @@ console = LoggingConfig().console
 llm_config = LLMConfig()
 model = llm_config.get_model('vision')
 
-# Redis store
-redis_init = RedisConnection(os.getenv("REDIS_URL"))
-vectorstore = redis_init.get_vectorstore()
-
 # Nodes
 @node
 def human_feedback_node(state: EvaluationState):
     """No-op node that should be interrupted on user input"""
     return state
 
-@node
 def init_evaluation(state: EvaluationState):
     return [
         Send("conduct_evaluation", {
@@ -109,6 +102,7 @@ builder.add_edge("conduct_evaluation", "evaluation_summary")
 builder.add_edge("evaluation_summary", END)
 
 graph = builder.compile(checkpointer=MemorySaver(), interrupt_before=["human_feedback_node"])
+# graph.get_graph().draw_mermaid_png(output_file_path="graph.png")
 
 
 # Input config
