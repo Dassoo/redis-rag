@@ -2,6 +2,8 @@
 
 This is a Python project designed to analyze historical documents using a LangGraph-based pipeline. It integrates Redis for structured storage and supports querying of processed document data, including transcription, translation, and keyword extraction.
 
+> A .env file with GOOGLE_API_KEY and REDIS_URL (see .env.example) have to be configured in the source folder.
+
 ## Features
 
 - 📄 **Document Processing Pipeline**: Process images or documents using LangGraph to extract and store evaluations.
