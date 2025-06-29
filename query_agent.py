@@ -23,9 +23,6 @@ import os
 # Config
 console = LoggingConfig().console
 
-redis_init = RedisConnection(os.getenv("REDIS_URL"))
-vectorstore = redis_init.get_vectorstore()
-
 # Get query model from config
 llm_config = LLMConfig()
 model = llm_config.get_model('query')
@@ -41,6 +38,8 @@ async def guardrail_function(ctx: RunContextWrapper[Any], agent: Agent, input: s
 
 def retrieve_relevant_evaluations(query: str, k: int) -> list[Document]:
     """Perform semantic similarity search from Redis vectorstore."""
+    redis_init = RedisConnection(os.getenv("REDIS_URL"))
+    vectorstore = redis_init.get_vectorstore()
     return vectorstore.similarity_search(query, k=k)
 
 def build_prompt(query: str, context_docs: list[Document]) -> list:
@@ -121,5 +120,30 @@ async def chat_loop():
         console.print(f"❌ An error occurred: {e}", style="error")
 
 
+async def redis_store():
+    redis_init = RedisConnection(os.getenv("REDIS_URL"))
+    redis_init.read_vectorstore()
+
+
 if __name__ == "__main__":
-    asyncio.run(chat_loop())
+    console.print("\nWelcome to the Redis RAG Query Agent", style="info")
+    console.print("""
+    [info]Available Options:[/info]
+    [green]chat[/green] - Start a chat session with the RAG system
+    [blue]store[/blue] - Connect to Redis and display available documents
+    [red]exit[/red] - Exit the program
+    """, highlight=False)
+    
+    selection = Prompt.ask(
+        "\n[input]Please select an option:[/input]",
+        choices=["chat", "store", "exit"],
+        console=console
+    )
+    
+    if selection == "chat":
+        asyncio.run(chat_loop())
+    elif selection == "store":
+        asyncio.run(redis_store())
+    elif selection == "exit":
+        console.print("\nGoodbye!", style="system")
+        exit()

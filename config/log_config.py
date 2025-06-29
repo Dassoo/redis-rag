@@ -12,7 +12,7 @@ class LoggingConfig:
             "assistant": "bold cyan",
             "system": "dim",
             "user": "bold white",
-            "info": "bold cyan",
+            "info": "bold blue",
             "warning": "yellow",
             "error": "bold red",
             "document": "green",

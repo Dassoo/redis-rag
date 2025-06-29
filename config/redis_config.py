@@ -29,7 +29,11 @@ class RedisConnection:
             ],
         )
 
-        self.vectorstore = RedisVectorStore(self.embeddings, config=self.config)
+        try:
+            self.vectorstore = RedisVectorStore(self.embeddings, config=self.config)
+        except Exception as e:
+            self.console.print(f"❌ Error connecting to Redis: {e}", style="error")
+            exit()
 
     def get_vectorstore(self) -> RedisVectorStore:
         """Return the initialized vector store."""
@@ -52,15 +56,21 @@ class RedisConnection:
         book_names = sorted(books.keys())
 
         self.console.print("\n📚 [info]Available books:[/info]")
+        if not book_names:
+            self.console.print("No books found.", style="warning")
+            return
+        
         for i, book in enumerate(book_names):
             self.console.print(f"[info]{i}[/info]: {book}")
 
+        book_index = Prompt.ask("\nSelect a book number to view (or 'quit' to exit)", console=self.console)
+        if book_index == "quit" or book_index == "exit":
+            return
         try:
-            book_index = int(Prompt.ask("\nSelect a book number to view", console=self.console))
-            selected_book = book_names[book_index]
+            selected_book = book_names[int(book_index)]
         except (ValueError, IndexError):
             self.console.print("❌ Invalid book selection.", style="error")
-            exit()
+            return
 
         # Select document in book
         image_ids = sorted(books[selected_book].keys())
