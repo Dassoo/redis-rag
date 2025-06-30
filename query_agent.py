@@ -101,6 +101,7 @@ async def chat_loop():
                 console.print("\nGoodbye!", style="system")
                 break
 
+            console.print("\nThinking...", style="system")
             new_messages = context_retrieval(user_input)
             full_input = conversation_history + new_messages
 
@@ -109,6 +110,7 @@ async def chat_loop():
 
             # Makes graph only if user input ends with "-g"
             if user_input.endswith("-g"):
+                console.print("\nBuilding connections...", style="system")
                 graph_response = await Runner.run(graph_agent, full_input)
                 console.print(graph_response.final_output, style="assistant")
 
