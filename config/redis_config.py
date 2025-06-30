@@ -64,7 +64,7 @@ class RedisConnection:
             self.console.print(f"[info]{i}[/info]: {book}")
 
         book_index = Prompt.ask("\nSelect a book number to view (or 'quit' to exit)", console=self.console)
-        if book_index == "quit" or book_index == "exit":
+        if book_index.lower() == "quit" or book_index.lower() == "exit":
             return
         try:
             selected_book = book_names[int(book_index)]

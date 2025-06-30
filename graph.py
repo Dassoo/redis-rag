@@ -107,6 +107,8 @@ graph = builder.compile(checkpointer=MemorySaver(), interrupt_before=["human_fee
 
 # Input config
 user_input = Prompt.ask("Please provide the path to the document or the folder you want to process", console=console)
+if user_input.lower() == "exit" or user_input.lower() == "quit":
+    exit()
 INPUT_PATH = Path(user_input)  # Can be a folder or a PDF
 TEMP_IMAGE_DIR = Path(INPUT_PATH.stem)
 TEMP_IMAGE_DIR.mkdir(exist_ok=True)
