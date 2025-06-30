@@ -10,6 +10,7 @@ from handlers.output_handler import OutputHandler
 from handlers.input_handler import InputHandler
 
 from rich.panel import Panel
+from rich.prompt import Prompt
 from pathlib import Path
 import base64
 import time
@@ -105,7 +106,7 @@ graph = builder.compile(checkpointer=MemorySaver(), interrupt_before=["human_fee
 
 
 # Input config
-user_input = console.input("Please provide the path to the document or the folder you want to process: ", style="input")
+user_input = Prompt.ask("Please provide the path to the document or the folder you want to process", console=console)
 INPUT_PATH = Path(user_input)  # Can be a folder or a PDF
 TEMP_IMAGE_DIR = Path(INPUT_PATH.stem)
 TEMP_IMAGE_DIR.mkdir(exist_ok=True)
@@ -113,7 +114,7 @@ TEMP_IMAGE_DIR.mkdir(exist_ok=True)
 image_files = InputHandler().extract(INPUT_PATH)
 
 
-feedback = console.input("Would you like to give some human-in-the-loop feedback for every scanned page? (y/n)", style="input")
+feedback = Prompt.ask("Would you like to give some human-in-the-loop feedback for every scanned page? (y/n)", console=console)
 if feedback.lower() == "y":
     feedback = True
 else:
