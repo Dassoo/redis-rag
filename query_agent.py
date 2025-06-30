@@ -90,7 +90,8 @@ graph_agent = Agent(
 )
 
 async def chat_loop():
-    console.print("\nChat session started. Type 'exit' to quit.", style="system")
+    console.print("\nChat session started. Type 'exit' to quit. Add '-g' to the query to build a relationship graph.", style="system")
+    console.print("The query must be fitting the stored documents or it will be rejected.", style="system")
 
     try:
         conversation_history = []
