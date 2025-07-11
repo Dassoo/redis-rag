@@ -20,13 +20,13 @@ class LLMConfig:
         """Initialize all models"""
         # Vision model for graph analysis
         self._models['vision'] = ChatGoogleGenerativeAI(
-            model="gemini-2.5-pro-preview-06-05",
+            model="gemini-2.5-pro",
             google_api_key=os.getenv("GOOGLE_API_KEY")
         )
 
         # Query model (using LiteLLM for OpenAI Agents SDK compatibility)
         self._models['query'] = LitellmModel(
-            model="gemini/gemini-2.5-flash-preview-05-20",
+            model="gemini/gemini-2.5-flash",
             api_key=os.getenv("GOOGLE_API_KEY")
         )
 

@@ -1,4 +1,4 @@
-# Redis Customized RAG (WIP)
+# Redis Customized RAG
 
 This is a Python project designed to analyze historical documents using a LangGraph-based pipeline. It integrates Redis for structured storage and supports querying of processed document data, including transcription, translation, and keyword extraction.
 

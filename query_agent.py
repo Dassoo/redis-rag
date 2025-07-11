@@ -1,6 +1,4 @@
 from langchain_core.documents import Document
-from rich.prompt import Prompt
-from rich.panel import Panel
 from config.redis_config import RedisConnection
 from config.log_config import LoggingConfig
 from config.llm_config import LLMConfig
@@ -15,10 +13,11 @@ from agents import (
     RunContextWrapper,
     TResponseInputItem,
 )
+from rich.prompt import Prompt
+from rich.panel import Panel
 from typing import Any
 import asyncio
 import os
-
 
 # Config
 console = LoggingConfig().console
